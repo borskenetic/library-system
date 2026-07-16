@@ -651,15 +651,36 @@ class BookController extends Controller
         $author = $request->author;
         $year = $request->year;
 
-        $copies = Book::whereNull('archived_at')
+        $query = Book::query()
+            ->whereNull('archived_at')
             ->where('title_statement', $title)
             ->where('main_author', $author)
-            ->where('pub_year', $year)
+            ->where('pub_year', $year);
+
+        $coverBook = (clone $query)->first();
+        $coverUrl = filled($coverBook?->cover_image)
+            ? asset('storage/'.$coverBook->cover_image)
+            : Branding::url('default_book');
+
+        $totalCopies = (clone $query)->count();
+        $availableCopies = (clone $query)->where('availability', 'Available')->count();
+        $borrowedCopies = max(0, $totalCopies - $availableCopies);
+
+        $copies = (clone $query)
             ->orderBy('accession_no', 'asc')
             ->paginate(PerPage::resolve($request, 10))
             ->withQueryString();
 
-        return view('books.copies_staff', compact('copies', 'title', 'author', 'year'));
+        return view('books.copies_staff', compact(
+            'copies',
+            'title',
+            'author',
+            'year',
+            'coverUrl',
+            'totalCopies',
+            'availableCopies',
+            'borrowedCopies',
+        ));
     }
 
     public function landingPage(Request $request)
