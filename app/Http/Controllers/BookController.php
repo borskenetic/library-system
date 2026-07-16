@@ -14,6 +14,7 @@ use App\Models\CatalogFramework;
 use App\Models\Setting;
 use App\Services\BookMarcDisplay;
 use App\Services\AdminActivityLogger;
+use App\Support\Branding;
 use App\Support\PerPage;
 use App\Support\PublicStoragePublisher;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -420,19 +421,29 @@ class BookController extends Controller
             ->paginate(PerPage::resolve($request, 10))
             ->withQueryString();
 
-        $singleCopyIds = collect($books->items())
-            ->filter(fn ($row) => (int) $row->copies === 1)
+        $sampleIds = collect($books->items())
             ->pluck('sample_id')
             ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
             ->all();
 
-        $availabilityById = $singleCopyIds === []
-            ? []
-            : Book::query()->whereIn('id', $singleCopyIds)->pluck('availability', 'id')->all();
+        $sampleBooksById = $sampleIds === []
+            ? collect()
+            : Book::query()
+                ->whereIn('id', $sampleIds)
+                ->get(['id', 'availability', 'cover_image'])
+                ->keyBy('id');
 
-        $books->through(function ($row) use ($availabilityById) {
+        $defaultBookUrl = Branding::url('default_book');
+
+        $books->through(function ($row) use ($sampleBooksById, $defaultBookUrl) {
             $sampleId = (int) $row->sample_id;
             $copies = (int) $row->copies;
+            $sample = $sampleBooksById->get($sampleId);
+            $coverUrl = filled($sample?->cover_image)
+                ? asset('storage/'.$sample->cover_image)
+                : $defaultBookUrl;
 
             return [
                 'title_statement' => $row->title_statement,
@@ -441,7 +452,8 @@ class BookController extends Controller
                 'content_type' => $row->content_type,
                 'copies' => $copies,
                 'sample_id' => $sampleId,
-                'availability' => $copies === 1 ? ($availabilityById[$sampleId] ?? null) : null,
+                'availability' => $copies === 1 ? ($sample?->availability ?? null) : null,
+                'cover_url' => $coverUrl,
             ];
         });
 

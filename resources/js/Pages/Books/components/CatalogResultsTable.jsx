@@ -28,6 +28,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
+import { BookTitlePreview } from '@/components/BookTitlePreview';
 
 function copiesStaffUrl(book) {
     const params = new URLSearchParams({
@@ -140,10 +141,11 @@ export function CatalogResultsTable({ books, perPage }) {
                                 ) : (
                                     books.data.map((book) => (
                                         <TableRow key={`${book.title_statement}-${book.sample_id}`}>
-                                            <TableCell className="max-w-[220px] font-medium">
-                                                <span className="line-clamp-2">
-                                                    {book.title_statement}
-                                                </span>
+                                            <TableCell className="max-w-[220px]">
+                                                <BookTitlePreview
+                                                    title={book.title_statement}
+                                                    coverUrl={book.cover_url}
+                                                />
                                             </TableCell>
                                             <TableCell className="max-w-[160px]">
                                                 <span className="line-clamp-2">
