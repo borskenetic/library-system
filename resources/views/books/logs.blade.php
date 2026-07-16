@@ -289,7 +289,22 @@
                         }
                     @endphp
                     <tr>
-                        <td class="circulation-table__title">{{ $log->book->title_statement ?? 'N/A' }}</td>
+                        <td class="circulation-table__title">
+                            @if($log->book)
+                                @php
+                                    $bookTitle = $log->book->title_statement ?? 'N/A';
+                                    $coverUrl = filled($log->book->cover_image)
+                                        ? asset('storage/' . $log->book->cover_image)
+                                        : $brand['default_book_url'];
+                                @endphp
+                                <span class="circ-book-title-trigger"
+                                      tabindex="0"
+                                      data-title="{{ $bookTitle }}"
+                                      data-cover="{{ $coverUrl }}">{{ $bookTitle }}</span>
+                            @else
+                                N/A
+                            @endif
+                        </td>
                         <td class="small">
                             @if($log->book)
                                 <code>{{ $log->book->copyIdentifierForCirculation() ?? '—' }}</code>
@@ -370,6 +385,11 @@
             </div>
         </div>
     </div>
+</div>
+
+<div id="circBookTitlePopover" class="circ-book-title-popover" hidden aria-hidden="true">
+    <img id="circBookTitlePopoverImg" class="circ-book-title-popover__cover" src="" alt="">
+    <span id="circBookTitlePopoverText" class="circ-book-title-popover__text"></span>
 </div>
 
 @if(session('overdue_modal'))
@@ -720,6 +740,89 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
         new bootstrap.Tooltip(el);
     });
+
+    (function initBookTitlePopover() {
+        const popover = document.getElementById('circBookTitlePopover');
+        const popoverImg = document.getElementById('circBookTitlePopoverImg');
+        const popoverText = document.getElementById('circBookTitlePopoverText');
+        if (!popover || !popoverImg || !popoverText) {
+            return;
+        }
+
+        let hideTimer = null;
+        let activeTrigger = null;
+
+        function hidePopover() {
+            popover.hidden = true;
+            popover.setAttribute('aria-hidden', 'true');
+            activeTrigger = null;
+        }
+
+        function positionPopover(trigger) {
+            const rect = trigger.getBoundingClientRect();
+            const margin = 8;
+            const popoverWidth = 200;
+            popover.hidden = false;
+            popover.setAttribute('aria-hidden', 'false');
+
+            let left = rect.left;
+            if (left + popoverWidth > window.innerWidth - margin) {
+                left = window.innerWidth - popoverWidth - margin;
+            }
+            left = Math.max(margin, left);
+
+            let top = rect.bottom + margin;
+            const popoverHeight = popover.offsetHeight;
+            if (top + popoverHeight > window.innerHeight - margin) {
+                top = rect.top - popoverHeight - margin;
+            }
+            top = Math.max(margin, top);
+
+            popover.style.left = left + 'px';
+            popover.style.top = top + 'px';
+        }
+
+        function showPopover(trigger) {
+            clearTimeout(hideTimer);
+            activeTrigger = trigger;
+            popoverImg.src = trigger.dataset.cover || '';
+            popoverImg.alt = trigger.dataset.title || 'Book cover';
+            popoverText.textContent = trigger.dataset.title || '';
+            positionPopover(trigger);
+        }
+
+        document.querySelectorAll('.circ-book-title-trigger').forEach(function (trigger) {
+            trigger.addEventListener('mouseenter', function () {
+                showPopover(trigger);
+            });
+            trigger.addEventListener('mouseleave', function () {
+                hideTimer = setTimeout(hidePopover, 120);
+            });
+            trigger.addEventListener('focus', function () {
+                showPopover(trigger);
+            });
+            trigger.addEventListener('blur', function () {
+                hideTimer = setTimeout(hidePopover, 120);
+            });
+        });
+
+        popover.addEventListener('mouseenter', function () {
+            clearTimeout(hideTimer);
+        });
+        popover.addEventListener('mouseleave', hidePopover);
+
+        window.addEventListener('scroll', function () {
+            if (activeTrigger && !popover.hidden) {
+                positionPopover(activeTrigger);
+            }
+        }, true);
+
+        window.addEventListener('resize', function () {
+            if (activeTrigger && !popover.hidden) {
+                positionPopover(activeTrigger);
+            }
+        });
+    })();
 
     const overdueModal = document.getElementById('overdueModal');
     if (overdueModal) {
