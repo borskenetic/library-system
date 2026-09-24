@@ -10,6 +10,29 @@
     <link rel="stylesheet" href="{{ asset('css/brand-typography.css') }}">
     <link rel="stylesheet" href="{{ asset('css/patrons/directory.css') }}">
     <link rel="stylesheet" href="{{ asset('css/patrons/register-public.css') }}">
+    <style>
+        /* Guaranteed contrast for submit — brand tokens sometimes paint these white-on-white */
+        .patron-register button.patron-register__submit--student {
+            color: #ffffff !important;
+            background-color: #1f4ea7 !important;
+            border: none !important;
+        }
+        .patron-register button.patron-register__submit--student:hover,
+        .patron-register button.patron-register__submit--student:focus {
+            background-color: #163a82 !important;
+            color: #ffffff !important;
+        }
+        .patron-register button.patron-register__submit--staff {
+            color: #ffffff !important;
+            background-color: #2e7d32 !important;
+            border: none !important;
+        }
+        .patron-register button.patron-register__submit--staff:hover,
+        .patron-register button.patron-register__submit--staff:focus {
+            background-color: #1b5e20 !important;
+            color: #ffffff !important;
+        }
+    </style>
 </head>
 <body>
 @php

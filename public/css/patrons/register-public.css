@@ -158,42 +158,56 @@
     margin-bottom: 1rem;
 }
 
-.patron-register__submit {
-    width: 100%;
-    margin-top: 0.5rem;
-    padding: 0.65rem 1rem;
-    font-size: 0.95rem;
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    color: #ffffff;
-    cursor: pointer;
-    background-color: #1f4ea7;
+.patron-register__submit,
+button.patron-register__submit,
+.patron-register button[type="submit"].patron-register__submit {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 1rem !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    color: #ffffff !important;
+    background: #1f4ea7 !important;
+    background-color: #1f4ea7 !important;
 }
 
-.patron-register__submit--student {
-    /* Prefer --brand-blue (direct hex). Avoid --brand-button-bg — it often
-       chains through unset tokens and becomes transparent / white. */
-    background-color: #1f4ea7;
-    background-color: var(--brand-blue, #1f4ea7);
-    color: #ffffff;
+.patron-register__submit--student,
+button.patron-register__submit--student {
+    color: #ffffff !important;
+    background: #1f4ea7 !important;
+    background-color: #1f4ea7 !important;
 }
 
-.patron-register__submit--student:hover {
-    background-color: #163a82;
-    background-color: var(--brand-blue-dark, #163a82);
-    color: #ffffff;
+.patron-register__submit--student:hover,
+.patron-register__submit--student:focus,
+button.patron-register__submit--student:hover,
+button.patron-register__submit--student:focus {
+    color: #ffffff !important;
+    background: #163a82 !important;
+    background-color: #163a82 !important;
 }
 
-.patron-register__submit--staff {
-    background-color: #2e7d32;
-    background-color: var(--brand-accent, #2e7d32);
-    color: #ffffff;
+.patron-register__submit--staff,
+button.patron-register__submit--staff {
+    color: #ffffff !important;
+    background: #2e7d32 !important;
+    background-color: #2e7d32 !important;
 }
 
-.patron-register__submit--staff:hover {
-    filter: brightness(0.92);
-    color: #ffffff;
+.patron-register__submit--staff:hover,
+.patron-register__submit--staff:focus,
+button.patron-register__submit--staff:hover,
+button.patron-register__submit--staff:focus {
+    color: #ffffff !important;
+    background: #1b5e20 !important;
+    background-color: #1b5e20 !important;
+    filter: none !important;
 }
 
 @media (max-width: 576px) {

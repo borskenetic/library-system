@@ -118,6 +118,8 @@
     </div>
 </section>
 
-<button type="submit" class="patron-register__submit patron-register__submit--staff">
+<button type="submit"
+        class="btn btn-success patron-register__submit patron-register__submit--staff"
+        style="display:block;width:100%;margin-top:1rem;padding:0.75rem 1rem;font-size:1rem;font-weight:700;color:#ffffff !important;background-color:#2e7d32 !important;border:none;border-radius:10px;cursor:pointer;">
     Submit faculty &amp; staff registration
 </button>

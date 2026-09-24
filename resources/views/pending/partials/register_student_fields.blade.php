@@ -126,6 +126,8 @@
     </div>
 </section>
 
-<button type="submit" class="patron-register__submit patron-register__submit--student">
+<button type="submit"
+        class="btn btn-primary patron-register__submit patron-register__submit--student"
+        style="display:block;width:100%;margin-top:1rem;padding:0.75rem 1rem;font-size:1rem;font-weight:700;color:#ffffff !important;background-color:#1f4ea7 !important;border:none;border-radius:10px;cursor:pointer;">
     Submit student registration
 </button>
