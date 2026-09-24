@@ -22,19 +22,22 @@ use Maatwebsite\Excel\Facades\Excel;
 class StudentController extends Controller
 {
     
-    private function generateNextQrCode()
+    private function generateNextQrCode(): string
     {
-        $lastStudent = Student::whereNotNull('qrcode')
-            ->orderByDesc('id')
-            ->first();
+        // Use the highest numeric S-######## code — not the latest row by id —
+        // so gaps / out-of-order IDs cannot reuse an existing QR (unique constraint).
+        $max = Student::query()
+            ->where('qrcode', 'like', 'S-%')
+            ->pluck('qrcode')
+            ->reduce(function (int $carry, ?string $code) {
+                if ($code && preg_match('/^S-(\d+)$/', $code, $matches)) {
+                    return max($carry, (int) $matches[1]);
+                }
 
-        $nextNumber = 1;
+                return $carry;
+            }, 0);
 
-        if ($lastStudent && preg_match('/S-(\d+)/', $lastStudent->qrcode, $matches)) {
-            $nextNumber = (int) $matches[1] + 1;
-        }
-
-        return 'S-' . str_pad($nextNumber, 8, '0', STR_PAD_LEFT);
+        return 'S-'.str_pad((string) ($max + 1), 8, '0', STR_PAD_LEFT);
     }
     
     // Show all students
@@ -320,6 +323,9 @@ class StudentController extends Controller
                 throw new \Exception('ID Number already exists in students table.');
             }
 
+            // Serialize QR allocation against concurrent approvals.
+            Student::query()->where('qrcode', 'like', 'S-%')->lockForUpdate()->get(['id']);
+
             Student::create([
                 'id_number' => strtoupper($pending->id_number),
                 'lastname' => strtoupper($pending->lastname),
@@ -337,7 +343,8 @@ class StudentController extends Controller
                 'emergency_address' => $pending->emergency_address,
                 'profile_picture' => $pending->profile_picture,
                 'student_signature' => $pending->student_signature,
-                'qrcode' => $pending->qrcode ?: $this->generateNextQrCode(),
+                // Always allocate a fresh library QR; never reuse a stale pending value.
+                'qrcode' => $this->generateNextQrCode(),
             ]);
 
             $pending->delete();

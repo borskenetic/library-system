@@ -166,24 +166,34 @@
     font-weight: 700;
     border: none;
     border-radius: 10px;
-    color: #fff;
+    color: #ffffff;
     cursor: pointer;
+    background-color: #1f4ea7;
 }
 
 .patron-register__submit--student {
-    background: var(--brand-button-bg, #1f4ea7);
+    /* Prefer --brand-blue (direct hex). Avoid --brand-button-bg — it often
+       chains through unset tokens and becomes transparent / white. */
+    background-color: #1f4ea7;
+    background-color: var(--brand-blue, #1f4ea7);
+    color: #ffffff;
 }
 
 .patron-register__submit--student:hover {
-    background: var(--brand-button-hover-bg, #2e7d32);
+    background-color: #163a82;
+    background-color: var(--brand-blue-dark, #163a82);
+    color: #ffffff;
 }
 
 .patron-register__submit--staff {
-    background: var(--brand-accent, #2e7d32);
+    background-color: #2e7d32;
+    background-color: var(--brand-accent, #2e7d32);
+    color: #ffffff;
 }
 
 .patron-register__submit--staff:hover {
     filter: brightness(0.92);
+    color: #ffffff;
 }
 
 @media (max-width: 576px) {

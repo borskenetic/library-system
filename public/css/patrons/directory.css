@@ -176,8 +176,13 @@
 
 .patron-dir__stat-card__label {
     font-size: 0.78rem;
-    color: #64748b;
+    font-weight: 600;
+    color: #334155;
     margin-top: 0.15rem;
+}
+
+.patron-dir__stat-card--alert .patron-dir__stat-card__label {
+    color: #92400e;
 }
 
 .patron-dir__decision-btns {
@@ -304,14 +309,15 @@
 }
 
 .patron-dir__btn--outline {
-    background: var(--brand-button-bg, #1f4ea7);
-    color: var(--brand-button-text, #fff);
-    border: 1px solid transparent;
+    background: #ffffff;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
 }
 
 .patron-dir__btn--outline:hover {
-    background: var(--brand-button-hover-bg, #163a82);
-    color: var(--brand-button-hover-text, #fff);
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #94a3b8;
 }
 
 .patron-dir__btn--ghost {
@@ -637,11 +643,11 @@
 .patron-dir__signature-wrap canvas {
     display: block;
     width: 100%;
-    max-width: 520px;
     height: 150px;
     border-radius: 8px;
     background: #fff;
     touch-action: none;
+    cursor: crosshair;
 }
 
 .patron-dir__form-actions {

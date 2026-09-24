@@ -9,7 +9,7 @@ use App\Models\Program;
 use App\Models\PendingEmployee;
 use App\Models\Role;
 use App\Support\MiddleInitial;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class PendingStudentController extends Controller
 {
@@ -113,18 +113,21 @@ class PendingStudentController extends Controller
     {
         DB::transaction(function () use ($id) {
 
-            // Lock students table for safe QR generation
-            $lastQr = Student::lockForUpdate()
-                ->orderBy('id', 'desc')
-                ->value('qrcode');
+            // Lock rows then take highest numeric S-######## (not latest by id).
+            Student::query()->where('qrcode', 'like', 'S-%')->lockForUpdate()->get(['id', 'qrcode']);
 
-            $nextNumber = 1;
+            $max = Student::query()
+                ->where('qrcode', 'like', 'S-%')
+                ->pluck('qrcode')
+                ->reduce(function (int $carry, ?string $code) {
+                    if ($code && preg_match('/^S-(\d+)$/', $code, $matches)) {
+                        return max($carry, (int) $matches[1]);
+                    }
 
-            if ($lastQr && str_starts_with($lastQr, 'S-')) {
-                $nextNumber = intval(Str::after($lastQr, 'S-')) + 1;
-            }
+                    return $carry;
+                }, 0);
 
-            $newQr = 'S-' . str_pad($nextNumber, 8, '0', STR_PAD_LEFT);
+            $newQr = 'S-'.str_pad((string) ($max + 1), 8, '0', STR_PAD_LEFT);
 
             $pending = PendingStudent::findOrFail($id);
 

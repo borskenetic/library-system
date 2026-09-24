@@ -193,13 +193,15 @@
 
         function resizeCanvas() {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            const width = canvas.parentElement.clientWidth;
-            const height = 150;
+            const rect = canvas.getBoundingClientRect();
+            const width = Math.max(1, Math.floor(rect.width));
+            const height = Math.max(1, Math.floor(rect.height));
+            const data = signaturePad.isEmpty() ? null : signaturePad.toData();
+
             canvas.width = width * ratio;
             canvas.height = height * ratio;
-            canvas.style.width = width + 'px';
-            canvas.style.height = height + 'px';
-            const data = signaturePad.isEmpty() ? null : signaturePad.toData();
+            canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
+
             signaturePad.clear();
             if (data) signaturePad.fromData(data);
         }
